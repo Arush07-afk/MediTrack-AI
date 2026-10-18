@@ -1,0 +1,6 @@
+TOTAL_BEDS = 247
+MODEL_DIR = "models"
+OCCUPANCY_MODEL_FILE = "occupancy_rf.joblib"
+ALERT_MODEL_FILE = "alert_rf.joblib"
+TRAINING_ROWS = 3240
+CRITICAL_OCCUPANCY_RATIO = 0.78
