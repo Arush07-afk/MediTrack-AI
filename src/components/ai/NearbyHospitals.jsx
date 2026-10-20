@@ -12,13 +12,13 @@ export default function NearbyHospitals({ data }) {
       <div className="flex items-center justify-between mb-4 relative z-10">
         <h3 className="text-gray-800 font-bold text-sm sm:text-base flex items-center gap-2">
           <div className="bg-emerald-100 p-1.5 rounded-lg text-emerald-600">
-             <MapPin size={16} />
+            <MapPin size={16} />
           </div>
           Nearby Hospitals Available
         </h3>
         <div className="flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md text-xs font-bold border border-emerald-100">
-           <Bot size={12} className="text-emerald-500" />
-           AI Sourced
+          <Bot size={12} className="text-emerald-500" />
+          Sample Data
         </div>
       </div>
 
@@ -26,11 +26,10 @@ export default function NearbyHospitals({ data }) {
         {data.map((hospital, index) => {
           const isFull = hospital.availableBeds === 0;
           return (
-            <div 
-              key={hospital.id || index} 
-              className={`flex items-center justify-between p-3 rounded-lg border ${
-                isFull ? 'bg-red-50/50 border-red-100' : 'bg-slate-50 border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/30'
-              } transition-colors`}
+            <div
+              key={hospital.id || index}
+              className={`flex items-center justify-between p-3 rounded-lg border ${isFull ? 'bg-red-50/50 border-red-100' : 'bg-slate-50 border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/30'
+                } transition-colors`}
             >
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-md ${isFull ? 'bg-red-100 text-red-500' : 'bg-white text-emerald-500 shadow-sm'}`}>

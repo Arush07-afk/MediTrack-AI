@@ -19,7 +19,7 @@ function RealTimeClock() {
   return (
     <div className="flex items-center gap-1.5 text-[11px] font-bold text-violet-600 bg-violet-50 border border-violet-200 px-2.5 py-1 rounded-full">
       <ClockIcon size={11} />
-      <span>{time.toLocaleTimeString()}</span>
+      <span className="font-mono min-w-[72px] text-center tabular-nums">{time.toLocaleTimeString()}</span>
     </div>
   );
 }
@@ -87,7 +87,7 @@ export default function Sidebar({ open, onClose }) {
         'fixed inset-y-0 left-0 z-50 w-72 shadow-2xl',
         'transition-transform duration-300 ease-in-out',
         open ? 'translate-x-0' : '-translate-x-full',
-        'md:relative md:translate-x-0 md:w-64 md:shadow-none md:z-auto',
+        'md:relative md:translate-x-0 md:w-72 md:shadow-none md:z-auto',
       ].join(' ')}
         style={{ borderRight: '1px solid #ede9fe' }}
       >

@@ -144,13 +144,11 @@ export default function AILiveBanner({ aiData }) {
             </div>
           </div>
 
-          {/* Right — confidence */}
+          {/* Right — model status */}
           <div className="flex items-center gap-2">
             <div className="text-right">
-              <p className="text-blue-300 text-[10px] font-bold uppercase tracking-wider">Model Confidence</p>
-              <p className="text-white font-black text-2xl leading-none">
-                {aiData?.peakHours?.confidence ?? '96%'}
-              </p>
+              <p className="text-blue-300 text-[10px] font-bold uppercase tracking-wider">Model Status</p>
+              <p className="text-emerald-400 font-black text-sm leading-none mt-0.5">Active</p>
             </div>
             <div className="w-10 h-10 rounded-full flex items-center justify-center"
               style={{ background: 'rgba(99,102,241,0.2)', border: '2px solid rgba(99,102,241,0.5)' }}>
@@ -174,7 +172,7 @@ export default function AILiveBanner({ aiData }) {
           </div>
           {/* Animated dots */}
           <div className="flex gap-1 shrink-0">
-            {[0,1,2].map(i => (
+            {[0, 1, 2].map(i => (
               <div key={i} className="w-1 h-1 rounded-full bg-blue-400"
                 style={{ animation: `bounce 1.4s ease-in-out ${i * 0.16}s infinite` }} />
             ))}
