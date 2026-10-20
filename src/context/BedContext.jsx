@@ -1,5 +1,17 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_BEDS, INITIAL_QUEUE } from '../data/mockData';
+
+const STORAGE_KEY_BEDS = 'meditrack_beds';
+const STORAGE_KEY_QUEUE = 'meditrack_queue';
+
+function loadFromStorage(key, fallback) {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 const BedContext = createContext(null);
 
@@ -9,17 +21,26 @@ export function useBeds() {
 }
 
 export function BedProvider({ children }) {
-  const [beds,  setBeds]  = useState(INITIAL_BEDS);
-  const [queue, setQueue] = useState(INITIAL_QUEUE);
+  const [beds, setBeds] = useState(() => loadFromStorage(STORAGE_KEY_BEDS, INITIAL_BEDS));
+  const [queue, setQueue] = useState(() => loadFromStorage(STORAGE_KEY_QUEUE, INITIAL_QUEUE));
+
+  // Persist to localStorage whenever beds or queue change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_BEDS, JSON.stringify(beds));
+  }, [beds]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_QUEUE, JSON.stringify(queue));
+  }, [queue]);
 
   // ── Bed CRUD ──────────────────────────────────────────────────
 
   function addBed(bedData) {
     const newBed = {
-      id:          `b${Date.now()}`,
-      status:      'available',
+      id: `b${Date.now()}`,
+      status: 'available',
       patientName: null,
-      timestamp:   null,
+      timestamp: null,
       ...bedData,
     };
     setBeds(prev => [...prev, newBed]);
@@ -27,25 +48,25 @@ export function BedProvider({ children }) {
 
   function updateBedStatus(bedId, newStatus, patientName = null) {
     const bed = beds.find(b => b.id === bedId);
-    
+
     // Auto-queue if changing status manually to discharging or transfer
     if (bed && bed.status === 'occupied') {
-        if (newStatus === 'discharging') {
-            addToQueue({ patientName: bed.patientName, requiredWard: bed.ward, tab: 'discharge', priority: 'Medium' });
-        } else if (newStatus === 'transfer') { 
-            addToQueue({ patientName: bed.patientName, requiredWard: bed.ward, tab: 'transfer', priority: 'High' });
-            newStatus = 'untidy'; // Map transfer status implicitly to untidy
-        }
+      if (newStatus === 'discharging') {
+        addToQueue({ patientName: bed.patientName, requiredWard: bed.ward, tab: 'discharge', priority: 'Medium' });
+      } else if (newStatus === 'transfer') {
+        addToQueue({ patientName: bed.patientName, requiredWard: bed.ward, tab: 'transfer', priority: 'High' });
+        newStatus = 'untidy'; // Map transfer status implicitly to untidy
+      }
     }
 
     setBeds(prev => prev.map(b =>
       b.id === bedId
         ? {
-            ...b,
-            status:      newStatus,
-            patientName: patientName ?? (newStatus === 'available' || newStatus === 'untidy' ? null : b.patientName),
-            timestamp:   newStatus === 'occupied' ? new Date().toISOString() : (newStatus === 'available' ? null : b.timestamp),
-          }
+          ...b,
+          status: newStatus,
+          patientName: patientName ?? (newStatus === 'available' || newStatus === 'untidy' ? null : b.patientName),
+          timestamp: newStatus === 'occupied' ? new Date().toISOString() : (newStatus === 'available' ? null : b.timestamp),
+        }
         : b
     ));
   }
@@ -106,8 +127,8 @@ export function BedProvider({ children }) {
   // ── Add patient to queue ──────────────────────────────────────
   function addToQueue(patientData) {
     const p = {
-      id:   `q${Date.now()}`,
-      tab:  'admin',
+      id: `q${Date.now()}`,
+      tab: 'admin',
       timestamp: new Date().toISOString(),
       priority: patientData.priority || 'Medium',
       ...patientData,
@@ -126,14 +147,14 @@ export function BedProvider({ children }) {
 
   // ── Computed stats ────────────────────────────────────────────
   const stats = {
-    total:       beds.length,
-    available:   beds.filter(b => b.status === 'available').length,
-    occupied:    beds.filter(b => b.status === 'occupied').length,
-    reserved:    beds.filter(b => b.status === 'reserved').length,
+    total: beds.length,
+    available: beds.filter(b => b.status === 'available').length,
+    occupied: beds.filter(b => b.status === 'occupied').length,
+    reserved: beds.filter(b => b.status === 'reserved').length,
     discharging: beds.filter(b => b.status === 'discharging').length,
-    untidy:      beds.filter(b => b.status === 'untidy').length,
-    faulty:      beds.filter(b => b.status === 'faulty').length,
-    isolation:   beds.filter(b => b.status === 'isolation').length,
+    untidy: beds.filter(b => b.status === 'untidy').length,
+    faulty: beds.filter(b => b.status === 'faulty').length,
+    isolation: beds.filter(b => b.status === 'isolation').length,
   };
 
   return (
