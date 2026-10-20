@@ -30,9 +30,12 @@ export default function PeakHourPrediction({ data }) {
             <span className="text-xs font-medium uppercase tracking-wide">Peak Times</span>
           </div>
           <div className="flex flex-wrap gap-1">
-            {data.predictedPeakHours.map((t, i) => (
-              <span key={i} className="bg-white border border-slate-200 text-slate-800 text-xs font-bold px-2 py-0.5 rounded shadow-sm">{t}</span>
-            ))}
+            {data.predictedPeakHours.length > 0
+              ? data.predictedPeakHours.map((t, i) => (
+                <span key={i} className="bg-white border border-slate-200 text-slate-800 text-xs font-bold px-2 py-0.5 rounded shadow-sm">{t}</span>
+              ))
+              : <span className="text-slate-500 text-xs font-medium">No peak expected</span>
+            }
           </div>
         </div>
         <div className="bg-blue-50 border border-blue-100 rounded-lg p-3">

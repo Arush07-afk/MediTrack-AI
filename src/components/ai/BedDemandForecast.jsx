@@ -7,20 +7,20 @@ export default function BedDemandForecast({ data }) {
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex flex-col h-full relative overflow-hidden group">
-      
+
       {/* Decorative AI background element */}
       <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
 
       <div className="flex items-center justify-between mb-4 relative z-10">
         <h3 className="text-gray-800 font-bold text-sm sm:text-base flex items-center gap-2">
           <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600">
-             <Cpu size={16} />
+            <Cpu size={16} />
           </div>
           AI Bed Demand Forecast
         </h3>
         <div className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-md text-xs font-bold border border-blue-100">
-           <TrendingUp size={12} className="text-blue-500" />
-           Projected
+          <TrendingUp size={12} className="text-blue-500" />
+          Projected
         </div>
       </div>
 
@@ -48,16 +48,16 @@ export default function BedDemandForecast({ data }) {
       </div>
 
       <div className="h-[180px] relative z-10 w-full mt-1">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={180}>
           <BarChart data={data.chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }} barSize={12} barGap={4}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-            <XAxis dataKey="timeframe" tick={{fontSize: 10, fill: '#94a3b8'}} axisLine={false} tickLine={false} />
+            <XAxis dataKey="timeframe" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
             <YAxis hide />
-            <Tooltip 
-              cursor={{fill: '#f8fafc'}}
+            <Tooltip
+              cursor={{ fill: '#f8fafc' }}
               contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
             />
-            <Legend wrapperStyle={{fontSize: '10px'}} iconType="circle" iconSize={6} />
+            <Legend wrapperStyle={{ fontSize: '10px' }} iconType="circle" iconSize={6} />
             <Bar dataKey="icu" name="ICU Beds" fill="#ef4444" radius={[4, 4, 0, 0]} />
             <Bar dataKey="general" name="General Beds" fill="#3b82f6" radius={[4, 4, 0, 0]} />
           </BarChart>

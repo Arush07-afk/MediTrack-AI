@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bot, MapPin, Building, Activity, Sparkles } from 'lucide-react';
 
-export default function NearbyHospitals({ data }) {
+export default function NearbyHospitals({ data, totalBeds }) {
   if (!data || data.length === 0) return null;
 
   return (
@@ -59,6 +59,11 @@ export default function NearbyHospitals({ data }) {
           );
         })}
       </div>
+
+      {/* Caption: data origin clarification */}
+      <p className="relative z-10 text-[10px] text-slate-400 mt-3 text-center italic">
+        Hospital-wide forecast ({totalBeds ?? 247} beds, simulated data)
+      </p>
     </div>
   );
 }

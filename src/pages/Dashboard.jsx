@@ -46,26 +46,30 @@ export default function Dashboard() {
   const [modal, setModal] = useState(CLOSED);
   const [aiData, setAiData] = useState(null);
   const [aiLoading, setAiLoading] = useState(true);
+  const [healthData, setHealthData] = useState(null);
+  const [isFestival, setIsFestival] = useState(false);
 
   useEffect(() => {
     const fetchAiData = async () => {
       try {
         const now = new Date();
         const hour = now.getHours();
-        const day = now.getDay() === 0 ? 6 : now.getDay() - 1;
-        const is_weekend = day >= 5 ? 1 : 0;
-        const is_festival = 0;
+        // JS getDay(): 0=Sunday…6=Saturday → API: 0=Monday…6=Sunday
+        const day = (now.getDay() + 6) % 7;
+        // is_weekend is derived server-side; send 0 for backward compat
+        const is_festival = isFestival ? 1 : 0;
 
-        const forecastRes = await fetch(
-          `http://127.0.0.1:8000/forecast?day=${day}&is_weekend=${is_weekend}&is_festival=${is_festival}&start_hour=${hour}`
-        );
+        const [forecastRes, predictRes, healthRes] = await Promise.all([
+          fetch(`http://127.0.0.1:8000/forecast?day=${day}&is_weekend=0&is_festival=${is_festival}&start_hour=${hour}`),
+          fetch(`http://127.0.0.1:8000/predict?hour=${hour}&day=${day}&is_weekend=0&is_festival=${is_festival}`),
+          fetch('http://127.0.0.1:8000/health'),
+        ]);
         const forecastJson = await forecastRes.json();
         const forecast = forecastJson.forecast;
-
-        const predictRes = await fetch(
-          `http://127.0.0.1:8000/predict?hour=${hour}&day=${day}&is_weekend=${is_weekend}&is_festival=${is_festival}`
-        );
         const predict = await predictRes.json();
+        const health = await healthRes.json();
+
+        setHealthData(health);
 
         const peakHours = forecast
           .filter(f => f.alert_probability > 30)
@@ -83,9 +87,11 @@ export default function Dashboard() {
 
         setAiData({
           peakHours: {
+            // Empty array handled by PeakHourPrediction — shows "No peak expected"
             predictedPeakHours: peakHours.slice(0, 3),
             expectedPatientLoad: predict.occupied,
-            confidence: `${100 - Math.round(predict.alert_probability)}%`,
+            // Real 90% forecast band from tree spread
+            range_beds: predict.range_beds,
             activityData
           },
           bedDemand: {
@@ -129,11 +135,11 @@ export default function Dashboard() {
     fetchAiData();
     const interval = setInterval(fetchAiData, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isFestival]);
 
   return (
     <>
-      <AILiveBanner aiData={aiData} />
+      <AILiveBanner aiData={aiData} healthData={healthData} />
 
       {/* ── Section tab nav ── */}
       <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide bg-white rounded-2xl p-1.5 mb-5"
@@ -158,7 +164,8 @@ export default function Dashboard() {
       {section === 'ward' ? (
         <WardView setModal={setModal} />
       ) : section === 'forecast' ? (
-        <ForecastSection aiData={aiData} aiLoading={aiLoading} />
+        <ForecastSection aiData={aiData} aiLoading={aiLoading} healthData={healthData}
+          isFestival={isFestival} setIsFestival={setIsFestival} />
       ) : section === 'stats' ? (
         <StatsDashboard />
       ) : section === 'patients' ? (

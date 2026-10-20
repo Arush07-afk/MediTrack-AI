@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Brain, Activity, Zap, TrendingUp, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import { useBeds } from '../../context/BedContext';
 
-export default function AILiveBanner({ aiData }) {
+export default function AILiveBanner({ aiData, healthData }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [insightIdx, setInsightIdx] = useState(0);
 
@@ -24,10 +24,13 @@ export default function AILiveBanner({ aiData }) {
 
   const occupancyPct = total > 0 ? Math.round((occupied / total) * 100) : 0;
 
+  const mae = healthData?.meta?.mae ?? 4.2;
+  const alertAcc = healthData?.meta?.alert_accuracy ?? 96.1;
+
   // Scrolling AI insights
   const insights = [
-    `🤖 Random Forest model active — MAE ±4.2 beds`,
-    `📊 96.1% alert detection accuracy`,
+    `🤖 Random Forest model active — MAE ±${mae} beds`,
+    `📊 ${alertAcc}% alert detection accuracy`,
     `⚡ Predictions refresh every 5 minutes`,
     isCurrentlyPeak ? `⚠️ Current hour (${hour}:00) is a predicted peak hour` : `✅ Current hour (${hour}:00) is within normal range`,
     `🎯 Next 6h ICU demand: ${aiData?.bedDemand?.next6Hours?.icu ?? '--'} beds`,

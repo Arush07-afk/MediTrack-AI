@@ -1,0 +1,10 @@
+{
+  "training_rows": 3240,
+  "mae": 5.39,
+  "alert_accuracy": 98.8,
+  "precision": 0.5625,
+  "recall": 0.9,
+  "f1": 0.6923,
+  "critical_share": 0.0154,
+  "model_dir": "D:\\MediTrack AI\\backend\\models"
+}

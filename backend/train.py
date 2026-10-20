@@ -4,6 +4,7 @@ on synthetic hospital admission patterns. Run manually: python train.py
 """
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 
@@ -12,7 +13,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, accuracy_score
+from sklearn.metrics import mean_absolute_error, accuracy_score, precision_recall_fscore_support
 
 from config import (
     ALERT_MODEL_FILE,
@@ -112,15 +113,32 @@ def train_and_save(model_root: Path | None = None) -> dict:
     alert_pred = clf.predict(x_test)
     acc = accuracy_score(y_alert_test, alert_pred)
 
+    # Precision, recall, F1 for the CRITICAL class (label=1)
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        y_alert_test, alert_pred, labels=[1], average="binary"
+    )
+    critical_share = float(y_alert_test.sum() / len(y_alert_test))
+
     joblib.dump(reg, model_root / OCCUPANCY_MODEL_FILE)
     joblib.dump(clf, model_root / ALERT_MODEL_FILE)
 
-    return {
+    metrics = {
         "training_rows": len(df),
         "mae": round(float(mae), 2),
         "alert_accuracy": round(float(acc) * 100, 1),
+        "precision": round(float(precision), 4),
+        "recall": round(float(recall), 4),
+        "f1": round(float(f1), 4),
+        "critical_share": round(critical_share, 4),
         "model_dir": str(model_root),
     }
+
+    # Persist metrics so the API can read them without retraining
+    metrics_path = model_root / "metrics.json"
+    with open(metrics_path, "w") as fh:
+        json.dump(metrics, fh, indent=2)
+
+    return metrics
 
 
 if __name__ == "__main__":
