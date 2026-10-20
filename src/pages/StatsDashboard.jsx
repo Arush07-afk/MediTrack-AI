@@ -101,17 +101,18 @@ export default function StatsDashboard() {
   }, {});
 
   const departmentDistribution = [
-    { name: 'ICU',          value: wardCounts['ICU']        || 2 },
-    { name: 'Emergency',    value: wardCounts['Emergency']  || 3 },
+    { name: 'ICU', value: wardCounts['ICU'] || 2 },
+    { name: 'Emergency', value: wardCounts['Emergency'] || 3 },
     { name: 'General Ward', value: wardCounts['Acute Ward'] || 4 },
-    { name: 'Maternity',    value: wardCounts['Maternity']  || 1 },
+    { name: 'Maternity', value: wardCounts['Maternity'] || 1 },
   ];
 
+  const freeBedStatuses = new Set(['available', 'untidy']);
   const liveSummaryStats = {
     ...statsData.summaryStats,
     totalBeds: beds.length,
-    occupiedBeds: beds.filter(b => b.status === 'occupied').length,
-    availableBeds: beds.filter(b => b.status === 'available').length
+    occupiedBeds: beds.filter(b => !freeBedStatuses.has(b.status)).length,
+    availableBeds: beds.filter(b => b.status === 'available').length,
   };
 
   return (
